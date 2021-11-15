@@ -69,6 +69,11 @@ export default function(opt) {
             debug('making new client with id %s', reqId);
             const info = await manager.newClient(reqId);
 
+            const client = manager.getClient(reqId);
+            if (!client) {
+                debug('#> Client not found');
+            }
+
             const url = schema + '://' + info.id + '.' + ctx.request.host;
             info.url = url;
             ctx.body = info;
@@ -107,6 +112,11 @@ export default function(opt) {
         debug('making new client with id %s', reqId);
         const info = await manager.newClient(reqId);
 
+        const client = manager.getClient(reqId);
+        if (!client) {
+            debug('#> Client not found');
+        }
+
         const url = schema + '://' + info.id + '.' + ctx.request.host;
         info.url = url;
         ctx.body = info;
@@ -119,7 +129,8 @@ export default function(opt) {
 
     server.on('request', (req, res) => {
         // without a hostname, we won't know who the request is for
-        const hostname = req.headers.host;
+        let hostname = req.headers.host;
+        debug('Host name -> %s', hostname);
         if (!hostname) {
             res.statusCode = 400;
             res.end('Host header is required');
@@ -131,9 +142,12 @@ export default function(opt) {
             appCallback(req, res);
             return;
         }
+        debug('ClientID -> %s', clientId);
 
         const client = manager.getClient(clientId);
+
         if (!client) {
+            debug('Client not found');
             res.statusCode = 404;
             res.end('404');
             return;

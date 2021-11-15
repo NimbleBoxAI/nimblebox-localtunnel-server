@@ -1,4 +1,4 @@
-#!/usr/bin/env node -r esm
+#!/usr/bin/env -vS node -r esm
 
 import 'localenv';
 import optimist from 'optimist';
